@@ -12,3 +12,16 @@
 ## 3. Locality Analysis
 - **Static Locality:** Analyze the static locality of the DFA.
 - **Dynamic Locality:** Examine the dynamic locality of the DFA.
+
+## How to Run the Program
+
+1. **Compile the Java Files:**
+   First, compile the Java source files using the following command. This will place the compiled `.class` files in the `bin` directory.
+
+   ```sh
+   javac -d bin src/register/Main.java src/register/Processor.java src/register/RegisterFile.java
+2. **Run the Java Program**
+   After compiling, run the program using the java command. Replace path/to/register.asm with the path to your register file.
+
+   ```sh
+   java -cp bin register.Main path/to/register.asm
