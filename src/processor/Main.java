@@ -8,7 +8,7 @@ import java.util.Set;
 public class Main {
     public static void main(String[] args) {
         if (args.length < 2) {
-            System.err.println("Usage: java register.Main <csvFilePath> <traceLength>");
+            System.err.println("Usage: java processor.Main <csvFilePath> <traceLength>");
             return;
         }
 
@@ -23,16 +23,18 @@ public class Main {
 
         printTransitionTable(transitionTable);
 
-        // Determine final states
         Set<String> finalStates = new HashSet<>();
-        finalStates.add("F3");
+        for (String state : transitionTable.keySet()) {
+            if (state.startsWith("F")) {
+                finalStates.add(state);
+            }
+        }
 
-        // Generate trace
         TraceGenerator traceGenerator = new TraceGenerator(transitionTable, finalStates);
         String trace = traceGenerator.generateTrace(traceLength);
         System.out.println("Generated trace: " + trace);
 
-        Processor processor = new Processor(transitionTable);
+        Processor processor = new Processor(transitionTable, finalStates);
 
         boolean result = processor.processInput(trace);
 
