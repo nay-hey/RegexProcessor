@@ -25,3 +25,9 @@
 
    ```sh
    java -cp bin processor.Main path/to/dfa.csv length of the trace to be generated
+
+## Documentation
+
+For detailed information about the project, including the DFA structure, simulator functionality, and locality analysis, please refer to the project documentation available at the following Google Docs link:
+
+[Project Documentation](https://docs.google.com/document/d/1cPBO43YiXDs8ulJmK5JPkgwBo_k5As54sy0AdXT05PE/edit?usp=sharing)
