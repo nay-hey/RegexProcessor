@@ -15,8 +15,17 @@ public class TraceGenerator {
 
     public String generateTrace(int length) {
         Random random = new Random();
-        StringBuilder trace = new StringBuilder(length);
-        String currentState = "I1"; 
+        StringBuilder trace = new StringBuilder();
+        String currentState = transitionTable.keySet()
+                                             .stream()
+                                             .filter(s -> s.startsWith("I"))
+                                             .findFirst()
+                                             .orElse(null);
+
+        if (currentState == null) {
+            System.err.println("No initial state found starting with 'I'.");
+            return "";
+        }
 
         for (int i = 0; i < length; i++) {
             Map<Character, String> transitions = transitionTable.get(currentState);
