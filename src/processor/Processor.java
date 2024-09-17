@@ -4,11 +4,11 @@ import java.util.Map;
 import java.util.Set;
 
 public class Processor {
-    private final Map<String, Map<Character, String>> transitionTable;
+    private final Map<String, Map<Integer, String>> transitionTable;
     private final Set<String> finalStates;
     private String currentState;
 
-    public Processor(Map<String, Map<Character, String>> transitionTable, Set<String> finalStates) {
+    public Processor(Map<String, Map<Integer, String>> transitionTable, Set<String> finalStates) {
         this.transitionTable = transitionTable;
         this.finalStates = finalStates;
         // Initialize currentState with an initial state starting with "I"
@@ -24,9 +24,11 @@ public class Processor {
     }
 
     public boolean processInput(String input) {
+        String[] symbols = input.split(","); // Split by the delimiter (comma)
+        
         for (int i = 0; i < input.length(); i++) {
-            char ch = input.charAt(i);
-            Map<Character, String> transitions = transitionTable.get(currentState);
+            int ch = Integer.parseInt(symbol); 
+            Map<Integer, String> transitions = transitionTable.get(currentState);
 
             if (transitions != null && transitions.containsKey(ch)) {
                 currentState = transitions.get(ch);
