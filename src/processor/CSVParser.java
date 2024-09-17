@@ -15,7 +15,7 @@ public class CSVParser {
         try (BufferedReader reader = new BufferedReader(new FileReader(csvFilePath))) {
             String line = reader.readLine(); 
             if (line != null) {
-                headers = line.split(","); // delimiter is a comma
+                headers = line.split(","); //delimiter is a comma
             } else {
                 return transitionTable;
             }
