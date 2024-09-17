@@ -15,27 +15,18 @@ public class TraceGenerator {
 
     public String generateTrace(int length) {
         Random random = new Random();
-        StringBuilder trace = new StringBuilder();
-        String currentState = transitionTable.keySet()
-                                             .stream()
-                                             .filter(s -> s.startsWith("I"))
-                                             .findFirst()
-                                             .orElse(null);
-
-        if (currentState == null) {
-            System.err.println("No initial state found starting with 'I'.");
-            return "";
-        }
+        StringBuilder trace = new StringBuilder(length);
+        String currentState = "I1";
 
         for (int i = 0; i < length; i++) {
             Map<Integer, String> transitions = transitionTable.get(currentState);
             if (transitions == null || transitions.isEmpty()) {
-                break;  
+                break;
             }
 
             Integer[] symbols = transitions.keySet().toArray(new Integer[0]);
             int randomSymbol = symbols[random.nextInt(symbols.length)];
-            trace.append(randomSymbol);
+            trace.append(randomSymbol).append(",");;
             currentState = transitions.get(randomSymbol);
         }
 
@@ -44,6 +35,8 @@ public class TraceGenerator {
         } else {
             System.out.println("String rejected, did not reach final state.");
         }
+
+        // Remove the trailing delimiter
         if (trace.length() > 0) {
             trace.setLength(trace.length() - 1); // Remove last comma
         }
