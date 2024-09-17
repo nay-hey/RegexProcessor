@@ -8,22 +8,22 @@ import java.util.Map;
 
 public class CSVParser {
 
-    public static Map<String, Map<Character, String>> parseTransitionTable(String csvFilePath) {
-        Map<String, Map<Character, String>> transitionTable = new HashMap<>();
+    public static Map<String, Map<Integer, String>> parseTransitionTable(String csvFilePath) {
+        Map<String, Map<Integer, String>> transitionTable = new HashMap<>();
         String[] headers;
 
         try (BufferedReader reader = new BufferedReader(new FileReader(csvFilePath))) {
-            String line = reader.readLine(); // Read header line
+            String line = reader.readLine(); 
             if (line != null) {
-                headers = line.split(",");
+                headers = line.split(","); // delimiter is a comma
             } else {
                 return transitionTable;
             }
 
-            // Convert headers to a, b, c, ...
-            Map<String, Character> headerToChar = new HashMap<>();
+            // Convert headers to positive integers starting from 1
+            Map<String, Integer> headerToInt = new HashMap<>();
             for (int i = 1; i < headers.length; i++) {
-                headerToChar.put(headers[i].trim(), (char) ('a' + i - 1));
+                headerToInt.put(headers[i].trim(), i);
             }
 
             // Process each subsequent line
@@ -31,10 +31,10 @@ public class CSVParser {
                 String[] parts = line.split(",");
                 if (parts.length == headers.length) {
                     String state = parts[0].trim();
-                    Map<Character, String> transitions = new HashMap<>();
+                    Map<Integer, String> transitions = new HashMap<>();
 
                     for (int i = 1; i < parts.length; i++) {
-                        char symbol = headerToChar.get(headers[i].trim());
+                        int symbol = headerToInt.get(headers[i].trim());
                         transitions.put(symbol, parts[i].trim());
                     }
 
