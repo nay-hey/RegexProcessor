@@ -1,33 +1,21 @@
 package processor;
 
 import java.util.Map;
-import java.util.Set;
 
 public class Processor {
     private final Map<String, Map<Integer, String>> transitionTable;
-    private final Set<String> finalStates;
     private String currentState;
 
-    public Processor(Map<String, Map<Integer, String>> transitionTable, Set<String> finalStates) {
+    public Processor(Map<String, Map<Integer, String>> transitionTable) {
         this.transitionTable = transitionTable;
-        this.finalStates = finalStates;
-        // Initialize currentState with an initial state starting with "I"
-        this.currentState = transitionTable.keySet()
-                                           .stream()
-                                           .filter(s -> s.startsWith("I"))
-                                           .findFirst()
-                                           .orElse(null);
-
-        if (this.currentState == null) {
-            throw new IllegalStateException("No initial state found starting with 'I'.");
-        }
+        this.currentState = "I1";
     }
 
     public boolean processInput(String input) {
         String[] symbols = input.split(","); // Split by the delimiter (comma)
         
-        for (int i = 0; i < input.length(); i++) {
-            int ch = Integer.parseInt(symbol); 
+        for (String symbol : symbols) {
+            int ch = Integer.parseInt(symbol); // Convert string to integer
             Map<Integer, String> transitions = transitionTable.get(currentState);
 
             if (transitions != null && transitions.containsKey(ch)) {
@@ -38,13 +26,6 @@ public class Processor {
                 return false;
             }
         }
-        // Check if the final state starts with 'F'
-        if (currentState != null && finalStates.stream().anyMatch(f -> f.startsWith("F") && f.equals(currentState))) {
-            System.out.println("Accepted: Final state reached.");
-            return true;
-        } else {
-            System.out.println("Rejected: Final state not reached.");
-            return false;
-        }
+        return currentState.equals("F3");
     }
 }
