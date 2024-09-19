@@ -7,16 +7,21 @@ import java.util.Set;
 public class TraceGenerator {
     private final Map<String, Map<Integer, String>> transitionTable;
     private final Set<String> finalStates;
+    private String initialState;
 
     public TraceGenerator(Map<String, Map<Integer, String>> transitionTable, Set<String> finalStates) {
         this.transitionTable = transitionTable;
         this.finalStates = finalStates;
+        this.initialState = transitionTable.keySet().stream()
+            .filter(state -> state.startsWith("I"))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("No initial state found"));
     }
 
     public String generateTrace(int length) {
         Random random = new Random();
         StringBuilder trace = new StringBuilder(length);
-        String currentState = "I1";
+        String currentState = initialState;
 
         for (int i = 0; i < length; i++) {
             Map<Integer, String> transitions = transitionTable.get(currentState);
@@ -48,7 +53,7 @@ public class TraceGenerator {
                 do {
                     chosenSymbol = symbols[random.nextInt(symbols.length)];
                     nextState = transitions.get(chosenSymbol);
-                } while (finalStates.contains(nextState));  // Avoid final state before the last step
+                } while (finalStates.contains(nextState)); 
             }
 
             trace.append(chosenSymbol).append(",");
@@ -56,16 +61,8 @@ public class TraceGenerator {
 
         }
 
-        // Remove the trailing delimiter
         if (trace.length() > 0) {
             trace.setLength(trace.length() - 1); 
-        }
-
-        // Check if the final state is reached after n transitions
-        if (finalStates.contains(currentState)) {
-            System.out.println("String accepted, reached final state.");
-        } else {
-            System.out.println("String rejected, did not reach final state.");
         }
 
         return trace.toString();
