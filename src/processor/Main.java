@@ -24,9 +24,12 @@ public class Main {
 
         // Determine final states
         Set<String> finalStates = new HashSet<>();
-        finalStates.add("F3");
+        for (String state : transitionTable.keySet()) {
+            if (state.startsWith("F")) {
+                finalStates.add(state);
+            }
+        }
 
-        // Generate trace
         TraceGenerator traceGenerator = new TraceGenerator(transitionTable, finalStates);
         String trace = traceGenerator.generateTrace(traceLength);
         System.out.println("Generated trace: " + trace);
