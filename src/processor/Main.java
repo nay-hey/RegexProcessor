@@ -22,6 +22,7 @@ public class Main {
 
         printTransitionTable(transitionTable);
 
+        // Determine final states
         Set<String> finalStates = new HashSet<>();
         for (String state : transitionTable.keySet()) {
             if (state.startsWith("F")) {
@@ -43,8 +44,11 @@ public class Main {
             System.out.println("String rejected, did not reach final state.");
         }
 
-        Map<String, Integer> accessCounts = processor.getStateAccessCounts();
-        System.out.println("State Access Counts: " + accessCounts);
+        Map<String, Integer> stateAccessCounts = processor.getStateAccessCounts();
+        System.out.println("State Access Counts: " + stateAccessCounts);
+
+        Map<String, Integer> edgeAccessCounts = processor.getEdgeAccessCounts();
+        System.out.println("Edge Access Counts: " + edgeAccessCounts);
     }
 
     private static void printTransitionTable(Map<String, Map<Integer, String>> transitionTable) {
