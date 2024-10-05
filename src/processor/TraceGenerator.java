@@ -1,64 +1,73 @@
 package processor;
 
-import java.util.Map;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
 public class TraceGenerator {
-    private final Map<String, Map<Integer, String>> transitionTable;
+    private final List<Transition> transitionTable;
     private final Set<String> finalStates;
     private String initialState;
 
-    public TraceGenerator(Map<String, Map<Integer, String>> transitionTable, Set<String> finalStates) {
+    public TraceGenerator(List<Transition> transitionTable, Set<String> finalStates) {
         this.transitionTable = transitionTable;
         this.finalStates = finalStates;
-        this.initialState = transitionTable.keySet().stream()
-            .filter(state -> state.startsWith("I"))
+        this.initialState = transitionTable.stream()
+            .filter(transition -> transition.state.startsWith("I"))
             .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("No initial state found"));
+            .orElseThrow(() -> new IllegalArgumentException("No initial state found"))
+            .state;
     }
 
     public String generateTrace(int length) {
         Random random = new Random();
         StringBuilder trace = new StringBuilder(length);
-        String currentState = initialState;
+        String[] currentState = {initialState}; 
+        int[] chosenSymbol = {-1}; 
 
         for (int i = 0; i < length; i++) {
-            Map<Integer, String> transitions = transitionTable.get(currentState);
-            if (transitions == null || transitions.isEmpty()) {
+            Transition currentTransition = transitionTable.stream()
+                .filter(t -> t.state.equals(currentState[0])) 
+                .findFirst()
+                .orElse(null);
+
+            if (currentTransition == null || currentTransition.symbolTransitions.isEmpty()) {
                 break; 
             }
 
-            Integer[] symbols = transitions.keySet().toArray(new Integer[0]);
+            List<SymbolTransition> transitions = currentTransition.symbolTransitions;
             String nextState = null;
-            int chosenSymbol = -1;
 
             if (i == length - 1) {
-                // We are at the last step (n-th transition), must transition to a final state if possible
-                for (int symbol : symbols) {
-                    if (finalStates.contains(transitions.get(symbol))) {
-                        chosenSymbol = symbol;
-                        nextState = transitions.get(symbol);
+                for (SymbolTransition symbolTransition : transitions) {
+                    if (finalStates.contains(symbolTransition.nextState)) {
+                        chosenSymbol[0] = symbolTransition.symbol; 
+                        nextState = symbolTransition.nextState;
                         break;
                     }
                 }
 
-                // If no final state transition found, fall back to a random transition
                 if (nextState == null) {
-                    chosenSymbol = symbols[random.nextInt(symbols.length)];
-                    nextState = transitions.get(chosenSymbol);
+                    chosenSymbol[0] = transitions.get(random.nextInt(transitions.size())).symbol;
+                    nextState = transitions.stream()
+                        .filter(st -> st.symbol == chosenSymbol[0]) 
+                        .findFirst()
+                        .orElse(null).nextState;
                 }
             } else {
-                // For the first (n-1) transitions, avoid final states
                 do {
-                    chosenSymbol = symbols[random.nextInt(symbols.length)];
-                    nextState = transitions.get(chosenSymbol);
-                } while (finalStates.contains(nextState)); 
+                    chosenSymbol[0] = transitions.get(random.nextInt(transitions.size())).symbol; // Update chosen symbol
+                    nextState = transitions.stream()
+                        .filter(st -> st.symbol == chosenSymbol[0]) 
+                        .findFirst()
+                        .orElse(null).nextState;
+                } while (finalStates.contains(nextState));
             }
 
-            trace.append(chosenSymbol).append(",");
-            currentState = nextState;
-
+            if (chosenSymbol[0] != -1) {
+                trace.append(chosenSymbol[0]).append(",");
+            }
+            currentState[0] = nextState; 
         }
 
         if (trace.length() > 0) {
