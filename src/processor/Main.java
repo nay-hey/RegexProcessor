@@ -1,7 +1,8 @@
 package processor;
 
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
 public class Main {
@@ -14,7 +15,7 @@ public class Main {
         String csvFilePath = args[0];
         int traceLength = Integer.parseInt(args[1]);
 
-        Map<String, Map<Integer, String>> transitionTable = CSVParser.parseTransitionTable(csvFilePath);
+        List<Transition> transitionTable = CSVParser.parseTransitionTable(csvFilePath);
         if (transitionTable.isEmpty()) {
             System.err.println("Error parsing CSV file.");
             return;
@@ -24,9 +25,9 @@ public class Main {
 
         // Determine final states
         Set<String> finalStates = new HashSet<>();
-        for (String state : transitionTable.keySet()) {
-            if (state.startsWith("F")) {
-                finalStates.add(state);
+        for (Transition transition : transitionTable) {
+            if (transition.state.startsWith("F")) {
+                finalStates.add(transition.state);
             }
         }
 
@@ -35,7 +36,6 @@ public class Main {
         System.out.println("Generated trace: " + trace);
 
         Processor processor = new Processor(transitionTable);
-
         boolean result = processor.processInput(trace);
 
         if (result) {
@@ -44,23 +44,40 @@ public class Main {
             System.out.println("String rejected, did not reach final state.");
         }
 
-        Map<String, Integer> stateAccessCounts = processor.getStateAccessCounts();
-        System.out.println("State Access Counts: " + stateAccessCounts);
-
-        Map<String, Integer> edgeAccessCounts = processor.getEdgeAccessCounts();
-        System.out.println("Edge Access Counts: " + edgeAccessCounts);
+        System.out.println("State Access Counts: " + processor.getStateAccessCounts());
+        System.out.println("Edge Access Counts: " + processor.getEdgeAccessCounts());
+        System.out.println("State Visit Sequence: " + processor.getStateVisitSequence());
+        System.out.println("Analysis: " + processor.analyzeTemporalLocality());
     }
 
-    private static void printTransitionTable(Map<String, Map<Integer, String>> transitionTable) {
+    private static void printTransitionTable(List<Transition> transitionTable) {
         System.out.println("Transition Table:");
-        for (Map.Entry<String, Map<Integer, String>> entry : transitionTable.entrySet()) {
-            String state = entry.getKey();
-            Map<Integer, String> transitions = entry.getValue();
-            System.out.print(state + ": ");
-            for (Map.Entry<Integer, String> transition : transitions.entrySet()) {
-                System.out.print(transition.getKey() + " -> " + transition.getValue() + ", ");
+        for (Transition transition : transitionTable) {
+            System.out.print(transition.state + ": ");
+            for (SymbolTransition symbolTransition : transition.symbolTransitions) {
+                System.out.print(symbolTransition.symbol + " -> " + symbolTransition.nextState + ", ");
             }
             System.out.println();
         }
+    }
+}
+
+class Transition {
+    String state;
+    List<SymbolTransition> symbolTransitions;
+
+    Transition(String state) {
+        this.state = state;
+        this.symbolTransitions = new ArrayList<>();
+    }
+}
+
+class SymbolTransition {
+    int symbol;
+    String nextState;
+
+    SymbolTransition(int symbol, String nextState) {
+        this.symbol = symbol;
+        this.nextState = nextState;
     }
 }
