@@ -25,6 +25,7 @@ Run TraceGenerator by providing the CSV file and the desired length of the trace
 java TraceGenerator <csv_file_name> <length>
 ```
 This will output a trace string of symbols, e.g., 2,3,8,1,1,8,8,7,7,4.
+
 Step 2: Compile and Run the DFA Processor
 Compile the DFA-related Java classes (Main, Processor, and CSVParser) into the bin directory:
 
