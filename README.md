@@ -17,22 +17,22 @@
 
 ### Step 1: Compile the Java Program
 
-1. **Compile `TraceGenerator.java`** to generate the trace:
+1. Compile `TraceGenerator.java` to generate the trace:
    ```sh
    javac TraceGenerator.java
-Run TraceGenerator by providing the CSV file and the desired length of the trace:
+2. Run `TraceGenerator` by providing the CSV file and the desired length of the trace:
 ```sh
 java TraceGenerator <csv_file_name> <length>
 ```
 This will output a trace string of symbols, e.g., 2,3,8,1,1,8,8,7,7,4.
 
-Step 2: Compile and Run the DFA Processor
-Compile the DFA-related Java classes (Main, Processor, and CSVParser) into the bin directory:
+###  Step 2: Compile and Run the DFA Processor
+1. Compile the DFA-related Java classes (Main, Processor, and CSVParser) into the bin directory:
 
 ```sh
 javac -d bin src/processor/Main.java src/processor/Processor.java src/processor/CSVParser.java
 ```
-Run the Main class in the processor package to simulate DFA processing. Pass the CSV file and the generated trace:
+2. Run the Main class in the processor package to simulate DFA processing. Pass the CSV file and the generated trace:
 
 ```sh
 java -cp bin processor.Main <csv_file> <trace>
@@ -40,7 +40,7 @@ java -cp bin processor.Main <csv_file> <trace>
 Example trace input:
 2,3,8,1,1,8,8,7,7,4
 
-Step 3: Plot Results (Optional)
+### Step 3: Plot Results (Optional)
 If the results need to be visualized, use a Python script (like plot.py) to generate a plot:
 
 ```sh
