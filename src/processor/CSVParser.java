@@ -21,11 +21,13 @@ public class CSVParser {
                 return transitionTable;
             }
 
+            // Convert headers to positive integers starting from 1
             HashMap<String, Integer> headerToInt = new HashMap<>();
             for (int i = 1; i < headers.length; i++) {
                 headerToInt.put(headers[i].trim(), i);
             }
 
+            // Process each subsequent line
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
                 if (parts.length == headers.length) {

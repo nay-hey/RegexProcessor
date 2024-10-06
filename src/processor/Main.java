@@ -8,12 +8,12 @@ import java.util.Set;
 public class Main {
     public static void main(String[] args) {
         if (args.length < 2) {
-            System.err.println("Usage: java processor.Main <csvFilePath> <traceLength>");
+            System.err.println("Usage: java processor.Main <csvFilePath> <trace>");
             return;
         }
 
         String csvFilePath = args[0];
-        int traceLength = Integer.parseInt(args[1]);
+        String trace = args[1];
 
         List<Transition> transitionTable = CSVParser.parseTransitionTable(csvFilePath);
         if (transitionTable.isEmpty()) {
@@ -23,7 +23,6 @@ public class Main {
 
         printTransitionTable(transitionTable);
 
-        // Determine final states
         Set<String> finalStates = new HashSet<>();
         for (Transition transition : transitionTable) {
             if (transition.state.startsWith("F")) {
@@ -31,13 +30,16 @@ public class Main {
             }
         }
 
-        TraceGenerator traceGenerator = new TraceGenerator(transitionTable, finalStates);
-        String trace = traceGenerator.generateTrace(traceLength);
-        System.out.println("Generated trace: " + trace);
+        System.out.println("Provided trace: " + trace);
 
         Processor processor = new Processor(transitionTable);
         boolean result = processor.processInput(trace);
+        processor.printAddressMap();
+        System.out.println(processor.analyzeTemporalLocality());
+        System.out.println(processor.analyzeSpatialLocality());
+        System.out.println(processor.cacheLocalityAnalysis());
 
+        processor.printAddressAccessSequence();
         if (result) {
             System.out.println("String accepted, reached final state.");
         } else {
