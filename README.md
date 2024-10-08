@@ -22,7 +22,7 @@
    javac -d bin TraceGenerator.java  
 2. Run `TraceGenerator` by providing the CSV file and the desired length of the trace:
 ```sh
-java TraceGenerator <csv_file_name> <length>
+java -cp bin TraceGenerator <csv_file_name> <length>
 ```
 This will output a trace string of symbols, e.g., 2,3,8,1,1,8,8,7,7,4.
 
