@@ -19,7 +19,7 @@
 
 1. Compile `TraceGenerator.java` to generate the trace:
    ```sh
-   javac TraceGenerator.java
+   javac -d bin TraceGenerator.java  
 2. Run `TraceGenerator` by providing the CSV file and the desired length of the trace:
 ```sh
 java TraceGenerator <csv_file_name> <length>
