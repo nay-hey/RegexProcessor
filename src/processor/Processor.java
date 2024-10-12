@@ -1,16 +1,19 @@
 package processor;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 public class Processor {
     private final List<Transition> transitionTable;
     private String currentState;
-    private final HashMap<String, Integer> stateAccessCount;
-    private final HashMap<String, Integer> edgeAccessCount;
     private final List<String> stateVisitSequence;
     private final HashMap<String, Integer> addressMap;
     private final List<Integer> addressAccessSequence; 
-    private final CacheSimulator cacheSimulator;
+
+    private static final int EDGE_SIZE = 4;  // Size in bytes for each edge
+
 
     public Processor(List<Transition> transitionTable) {
         this.transitionTable = transitionTable;
@@ -21,24 +24,29 @@ public class Processor {
             .orElseThrow(() -> new IllegalArgumentException("No initial state found"))
             .state;
 
-        this.stateAccessCount = new HashMap<>();
-        this.edgeAccessCount = new HashMap<>();
         this.stateVisitSequence = new ArrayList<>(); 
         this.addressMap = new HashMap<>();
         this.addressAccessSequence = new ArrayList<>();
-        this.cacheSimulator = new CacheSimulator(4);
-
-        int addressCounter = 1;
+        int currentAddress = 0;
         for (Transition transition : transitionTable) {
-            stateAccessCount.put(transition.state, 0);
-            addressMap.put(transition.state, addressCounter++); 
+            addressMap.put(transition.state, currentAddress); 
+           
             for (SymbolTransition st : transition.symbolTransitions) {
                 String edgeKey = transition.state + "," + st.symbol + "->" + st.nextState;
-                addressMap.put(edgeKey, addressCounter++); 
+                addressMap.put(edgeKey, currentAddress);
+                currentAddress += EDGE_SIZE; 
             }
         }
     }
-
+    public void saveAddressAccessSequenceToFile(String filePath) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            for (Integer address : addressAccessSequence) {
+                writer.write(address + "\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     public boolean processInput(String input) {
         String[] symbols = input.split(",");
 
@@ -49,13 +57,7 @@ public class Processor {
                 .findFirst()
                 .orElse(null);
 
-            stateAccessCount.put(currentState, stateAccessCount.get(currentState) + 1);
-            stateVisitSequence.add(currentState); 
-            int stateAddress = addressMap.get(currentState);
-            addressAccessSequence.add(stateAddress);
-
-            cacheSimulator.access(stateAddress);
-
+            
             if (currentTransition != null) {
                 SymbolTransition nextTransition = currentTransition.symbolTransitions.stream()
                     .filter(st -> st.symbol == ch)
@@ -64,13 +66,15 @@ public class Processor {
 
                 if (nextTransition != null) {
                     String edgeKey = currentState + "," + ch + "->" + nextTransition.nextState;
-                    edgeAccessCount.put(edgeKey, edgeAccessCount.getOrDefault(edgeKey, 0) + 1);
                     int edgeAddress = addressMap.get(edgeKey);
                     addressAccessSequence.add(edgeAddress);
 
-                    cacheSimulator.access(edgeAddress);
-
                     currentState = nextTransition.nextState;
+                    stateVisitSequence.add(currentState); 
+                    int stateAddress = addressMap.get(currentState);
+                    System.out.println(stateAddress);
+                   // addressAccessSequence.add(stateAddress);
+        
                     System.out.println("Current state after processing '" + ch + "': " + currentState);
                 } else {
                     System.out.println("Transition not found for state '" + currentState + "' and character '" + ch + "'");
@@ -78,25 +82,10 @@ public class Processor {
                 }
             }
 
-            if (i == symbols.length - 1) {
-                stateAccessCount.put(currentState, stateAccessCount.get(currentState) + 1);
-            }
         }
 
         boolean isAccepted = currentState.startsWith("F");
         return isAccepted;
-    }
-
-    public String cacheLocalityAnalysis() {
-        return cacheSimulator.getCacheStats();
-    }
-
-    public HashMap<String, Integer> getStateAccessCounts() {
-        return stateAccessCount;
-    }
-
-    public HashMap<String, Integer> getEdgeAccessCounts() {
-        return edgeAccessCount;
     }
 
     public List<String> getStateVisitSequence() {
@@ -161,50 +150,6 @@ public class Processor {
         return analysisResult.toString();
     }
 
-    private class CacheSimulator {
-        private final int cacheSize;
-        private final LinkedHashSet<Integer> cache;
-        private int hits, misses;
-
-        public CacheSimulator(int cacheSize) {
-            this.cacheSize = cacheSize;
-            this.cache = new LinkedHashSet<>();
-            this.hits = 0;
-            this.misses = 0;
-        }
-
-        public void access(int address) {
-            if (cache.contains(address)) {
-                hits++;
-                cache.remove(address);
-                cache.add(address);
-                System.out.println("Cache Hit: Address " + address);
-            } else {
-                misses++;
-                System.out.println("Cache Miss: Address " + address);
-                if (cache.size() >= cacheSize) {
-                    Iterator<Integer> it = cache.iterator();
-                    if (it.hasNext()) {
-                        System.out.println("Evicting Address: " + it.next());
-                        it.remove();
-                    }
-                }
-                cache.add(address);
-            }
-        }
-
-        public String getCacheStats() {
-            return "Cache Hits: " + hits + ", Cache Misses: " + misses + ", Hit Ratio: " +
-                   (hits + misses == 0 ? 0 : (double) hits / (hits + misses));
-        }
-    }
-
-    public void printAddressMap() {
-        System.out.println("Address Map:");
-        for (Map.Entry<String, Integer> entry : addressMap.entrySet()) {
-            System.out.println("State/Edge: " + entry.getKey() + " - Address: " + entry.getValue());
-        }
-    }
     public void printAddressAccessSequence() {
         System.out.println("Address Access Sequence: " + addressAccessSequence);
     }

@@ -34,22 +34,18 @@ public class Main {
 
         Processor processor = new Processor(transitionTable);
         boolean result = processor.processInput(trace);
-        processor.printAddressMap();
-        System.out.println(processor.analyzeTemporalLocality());
-        System.out.println(processor.analyzeSpatialLocality());
-        System.out.println(processor.cacheLocalityAnalysis());
-
         processor.printAddressAccessSequence();
+        String filePath = "address_access_sequence.txt";
+        processor.saveAddressAccessSequenceToFile(filePath);
+
+        System.out.println("Address access sequence saved to: " + filePath);
         if (result) {
             System.out.println("String accepted, reached final state.");
         } else {
             System.out.println("String rejected, did not reach final state.");
         }
 
-        System.out.println("State Access Counts: " + processor.getStateAccessCounts());
-        System.out.println("Edge Access Counts: " + processor.getEdgeAccessCounts());
         System.out.println("State Visit Sequence: " + processor.getStateVisitSequence());
-        System.out.println("Analysis: " + processor.analyzeTemporalLocality());
     }
 
     private static void printTransitionTable(List<Transition> transitionTable) {
