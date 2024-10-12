@@ -15,16 +15,31 @@
 
 ## How to Run the Program
 
-1. **Compile the Java Files:**
-   First, compile the Java source files using the following command. This will place the compiled `.class` files in the `bin` directory.
+### Step 1: Compile the Java Program
 
+1. Compile `TraceGenerator.java` to generate the trace:
    ```sh
-   javac -d bin src/processor/Main.java src/processor/Processor.java src/processor/CSVParser.java src/processor/TraceGenerator.java
-2. **Run the Java Program**
-   After compiling, run the program using the java command. Replace path/to/register.asm with the path to your register file.
+   javac -d bin TraceGenerator.java  
+2. Run `TraceGenerator` by providing the CSV file and the desired length of the trace:
+```sh
+java -cp bin TraceGenerator <csv_file_name> <length>
+```
+This will output a trace string of symbols, e.g., 2,3,8,1,1,8,8,7,7,4.
 
-   ```sh
-   java -cp bin processor.Main path/to/dfa.csv length of the trace to be generated
+###  Step 2: Compile and Run the DFA Processor
+1. Compile the DFA-related Java classes (Main, Processor, and CSVParser) into the bin directory:
+
+```sh
+javac -d bin src/processor/Main.java src/processor/Processor.java src/processor/CSVParser.java
+```
+2. Run the Main class in the processor package to simulate DFA processing. Pass the CSV file and the generated trace:
+
+```sh
+java -cp bin processor.Main <csv_file> <trace>
+```
+Example trace input:
+2,3,8,1,1,8,8,7,7,4
+
 
 ## Documentation
 
