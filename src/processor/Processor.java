@@ -4,19 +4,36 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
+class AddressAccess {
+    int address;
+
+    AddressAccess(String operation, int address) {
+        this.address = address;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("0 0x%08X", address);
+    }
+}
 
 public class Processor {
     private final List<Transition> transitionTable;
     private String currentState;
     private final List<String> stateVisitSequence;
     private final HashMap<String, Integer> addressMap;
-    private final List<Integer> addressAccessSequence; 
+    private final List<AddressAccess> addressAccessSequence; 
 
-    private static final int EDGE_SIZE = 4;  // Size in bytes for each edge
-
+    private static final int EDGE_SIZE = 2; 
+    private boolean debug;
 
     public Processor(List<Transition> transitionTable) {
+        this(transitionTable, false); 
+    }
+
+    public Processor(List<Transition> transitionTable, boolean debug) {
         this.transitionTable = transitionTable;
+        this.debug = debug;
 
         this.currentState = transitionTable.stream()
             .filter(transition -> transition.state.startsWith("I"))
@@ -40,13 +57,14 @@ public class Processor {
     }
     public void saveAddressAccessSequenceToFile(String filePath) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-            for (Integer address : addressAccessSequence) {
-                writer.write(address + "\n");
+            for (AddressAccess access : addressAccessSequence) {
+                writer.write(access.toString() + "\n"); 
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+    
     public boolean processInput(String input) {
         String[] symbols = input.split(",");
 
@@ -67,92 +85,45 @@ public class Processor {
                 if (nextTransition != null) {
                     String edgeKey = currentState + "," + ch + "->" + nextTransition.nextState;
                     int edgeAddress = addressMap.get(edgeKey);
-                    addressAccessSequence.add(edgeAddress);
+                    String operationType = ""; 
+                    addressAccessSequence.add(new AddressAccess(operationType, edgeAddress));
 
                     currentState = nextTransition.nextState;
                     stateVisitSequence.add(currentState); 
-                    int stateAddress = addressMap.get(currentState);
-                    System.out.println(stateAddress);
-                   // addressAccessSequence.add(stateAddress);
-        
-                    System.out.println("Current state after processing '" + ch + "': " + currentState);
+                    if (debug) {
+                        System.out.println("Current state after processing '" + ch + "': " + currentState);
+                    }
                 } else {
-                    System.out.println("Transition not found for state '" + currentState + "' and character '" + ch + "'");
+                    if (debug) {
+                        System.out.println("Transition not found for state '" + currentState + "' and character '" + ch + "'");
+                    }
                     return false;
                 }
             }
 
         }
 
-        boolean isAccepted = currentState.startsWith("F");
-        return isAccepted;
+        return currentState.startsWith("F");
     }
 
     public List<String> getStateVisitSequence() {
         return stateVisitSequence;
     }
 
-    public String analyzeTemporalLocality() {
-        HashMap<String, List<Integer>> revisitDistances = new HashMap<>();
-        HashMap<String, Integer> lastVisitIndex = new HashMap<>();
-
-        for (int i = 0; i < stateVisitSequence.size(); i++) {
-            String state = stateVisitSequence.get(i);
-
-            if (lastVisitIndex.containsKey(state)) {
-                int lastIndex = lastVisitIndex.get(state);
-                int distance = i - lastIndex;
-
-                if (!revisitDistances.containsKey(state)) {
-                    revisitDistances.put(state, new ArrayList<>());
-                }
-                revisitDistances.get(state).add(distance);
-            }
-
-            lastVisitIndex.put(state, i);
+    private static void debugPrint(String message, boolean debug) {
+        if (debug) {
+            System.out.println("[DEBUG] " + message);
         }
-
-        StringBuilder analysisResult = new StringBuilder();
-        for (String state : revisitDistances.keySet()) {
-            List<Integer> distances = revisitDistances.get(state);
-
-            int totalDistance = distances.stream().mapToInt(Integer::intValue).sum();
-            double averageDistance = (double) totalDistance / distances.size();
-
-            int maxDistance = distances.stream().mapToInt(Integer::intValue).max().orElse(0);
-            int minDistance = distances.stream().mapToInt(Integer::intValue).min().orElse(0);
-
-            analysisResult.append("State: ").append(state)
-                          .append(", Revisits: ").append(distances.size())
-                          .append(", Avg Distance: ").append(String.format("%.2f", averageDistance))
-                          .append(", Min Distance: ").append(minDistance)
-                          .append(", Max Distance: ").append(maxDistance)
-                          .append("\n");
-        }
-
-        return analysisResult.toString();
     }
 
-    public String analyzeSpatialLocality() {
-        HashMap<Integer, Integer> addressAccessCount = new HashMap<>();
-
-        for (Integer address : addressAccessSequence) {
-            addressAccessCount.put(address, addressAccessCount.getOrDefault(address, 0) + 1);
+    public void printAddressAccessSequence(boolean debug) {
+        debugPrint("Address Access Sequence: ", debug);
+        for (AddressAccess access : addressAccessSequence) {
+            debugPrint(access.toString(), debug);
         }
-
-        StringBuilder analysisResult = new StringBuilder();
-        analysisResult.append("Address Spatial Locality Analysis:\n");
-        for (Map.Entry<Integer, Integer> entry : addressAccessCount.entrySet()) {
-            analysisResult.append("Address: ").append(entry.getKey())
-                          .append(", Access Count: ").append(entry.getValue()).append("\n");
-        }
-
-        return analysisResult.toString();
-    }
-
-    public void printAddressAccessSequence() {
-        System.out.println("Address Access Sequence: " + addressAccessSequence);
     }
     
-    
+    public void setDebug(boolean debug) {
+        this.debug = debug;
+    }
 }
