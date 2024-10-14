@@ -1,28 +1,45 @@
 package processor;
 
 import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class Main {
+    private static boolean debug = false;
+
     public static void main(String[] args) {
-        if (args.length < 2) {
-            System.err.println("Usage: java processor.Main <csvFilePath> <trace>");
+        if (args.length >= 4 && args[3].equals("debug")) {
+            debug = true;  
+        }
+
+        if (args.length < 3) {
+            System.err.println("Usage: java processor.Main <csvFilePath> <traceFilePath> <outputFilePath>");
             return;
         }
 
         String csvFilePath = args[0];
-        String trace = args[1];
+        String traceFilePath = args[1];
+        String outputFilePath = args[2];
 
         List<Transition> transitionTable = CSVParser.parseTransitionTable(csvFilePath);
         if (transitionTable.isEmpty()) {
             System.err.println("Error parsing CSV file.");
             return;
         }
-
+        
         printTransitionTable(transitionTable);
 
+        String trace = readTraceFromFile(traceFilePath);
+        if (trace == null || trace.isEmpty()) {
+            System.err.println("Error reading trace from file or file is empty.");
+            return;
+        }
+
+        debugPrint("Provided trace: " + trace);
         Set<String> finalStates = new HashSet<>();
         for (Transition transition : transitionTable) {
             if (transition.state.startsWith("F")) {
@@ -30,32 +47,50 @@ public class Main {
             }
         }
 
-        System.out.println("Provided trace: " + trace);
-
-        Processor processor = new Processor(transitionTable);
+        Processor processor = new Processor(transitionTable, debug);
+        if (args.length >= 4 && args[3].equals("debug")) {
+            processor.setDebug(true);  
+        }
         boolean result = processor.processInput(trace);
-        processor.printAddressAccessSequence();
-        String filePath = "address_access_sequence.txt";
-        processor.saveAddressAccessSequenceToFile(filePath);
+        processor.printAddressAccessSequence(debug);
+        
+        processor.saveAddressAccessSequenceToFile(outputFilePath);
 
-        System.out.println("Address access sequence saved to: " + filePath);
+        System.out.println("Address access sequence saved to: " + outputFilePath);
         if (result) {
             System.out.println("String accepted, reached final state.");
         } else {
             System.out.println("String rejected, did not reach final state.");
         }
 
-        System.out.println("State Visit Sequence: " + processor.getStateVisitSequence());
+        debugPrint("State Visit Sequence: " + processor.getStateVisitSequence());
     }
 
+    private static void debugPrint(String message) {
+        if (debug) {
+            System.out.println("[DEBUG] " + message);
+        }
+    }
+
+    private static String readTraceFromFile(String filePath) {
+        try {
+            return new String(Files.readAllBytes(Paths.get(filePath))).trim();
+        } catch (IOException e) {
+            System.err.println("Error reading trace from file: " + e.getMessage());
+            return null;
+        }
+    }
     private static void printTransitionTable(List<Transition> transitionTable) {
-        System.out.println("Transition Table:");
+        debugPrint("Transition Table:");
         for (Transition transition : transitionTable) {
-            System.out.print(transition.state + ": ");
+            StringBuilder sb = new StringBuilder(transition.state + ": ");
             for (SymbolTransition symbolTransition : transition.symbolTransitions) {
-                System.out.print(symbolTransition.symbol + " -> " + symbolTransition.nextState + ", ");
+                sb.append(symbolTransition.symbol)
+                  .append(" -> ")
+                  .append(symbolTransition.nextState)
+                  .append(", ");
             }
-            System.out.println();
+            debugPrint(sb.toString());
         }
     }
 }
