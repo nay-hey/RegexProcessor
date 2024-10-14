@@ -1,5 +1,7 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +34,7 @@ public class TraceGenerator {
     private final List<Transition> transitionTable;
     private final Set<String> finalStates;
     private String initialState;
+    private static boolean debug = false;
 
     public TraceGenerator(List<Transition> transitionTable, Set<String> finalStates) {
         this.transitionTable = transitionTable;
@@ -140,13 +143,20 @@ public class TraceGenerator {
     }
 
     public static void main(String[] args) {
-        if (args.length < 2) {
-            System.out.println("Usage: java TraceGenerator <csvFilePath> <traceLength>");
+
+        if (args.length >= 4 && args[3].equals("debug")) {
+            debug = true;  
+        }
+
+
+        if (args.length < 3) {
+            System.out.println("Usage: java TraceGenerator <csvFilePath> <traceLength> <outputFilePath>");
             return;
         }
 
         String csvFilePath = args[0];
         int traceLength = Integer.parseInt(args[1]);
+        String outputFilePath = args[2];
 
         List<Transition> transitionTable = parseTransitionTable(csvFilePath);
 
@@ -160,6 +170,17 @@ public class TraceGenerator {
         TraceGenerator generator = new TraceGenerator(transitionTable, finalStates);
 
         String trace = generator.generateTrace(traceLength);
-        System.out.println("Generated Trace: " + trace);
+        debugPrint("Generated Trace: " + trace);
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFilePath))) {
+            writer.write(trace);
+            System.out.println("Trace written to file: " + outputFilePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    private static void debugPrint(String message) {
+        if (debug) {
+            System.out.println("[DEBUG] " + message);
+        }
     }
 }
