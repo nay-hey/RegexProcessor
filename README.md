@@ -29,7 +29,7 @@ This project involves the creation of a **Deterministic Finite Automaton (DFA)**
    javac -d bin TraceGenerator.java  
 2. Run `TraceGenerator` by providing the CSV file and the desired length of the trace:
 ```sh
-java -cp bin TraceGenerator <csv_file_name> <length>
+java -cp bin TraceGenerator <csv_file_name> <length> <debug>
 ```
 This will output a trace string of symbols, e.g., 2,3,8,1,1,8,8,7,7,4.
 
@@ -42,7 +42,7 @@ javac -d bin src/processor/Main.java src/processor/Processor.java src/processor/
 2. Run the Main class in the processor package to simulate DFA processing. Pass the CSV file and the generated trace:
 
 ```sh
-java -cp bin processor.Main <csv_file> <trace>
+java -cp bin processor.Main <csv_file> <trace> <debug>
 ```
 Example trace input:
 2,3,8,1,1,8,8,7,7,4
@@ -68,11 +68,11 @@ The `<debug>` argument is optional and can be `true` or `false`. If `true`, deta
 ## Locality Analysis with Dinero
 
 ### 1. **Run the DineroIV Simulation**:
-   - After generating the address access sequence file (e.g., `output_trace.txt`), the data can be fed into **DineroIV** for cache locality analysis.
+   - After generating the address access sequence file (e.g., `output_trace.din`), the data can be fed into **DineroIV** for cache locality analysis.
 
    - Command to run DineroIV with the generated access sequence:
      ```sh
-     dineroIV -l1-usize 16K -informat d < output_trace.txt
+     dineroIV -l1-usize 4 -l1-ubsize 4 -l1-uassoc 1 -l1-urepl l -informat d < output_trace.din > results.txt
      ```
    - This runs a cache simulation and provides cache hit/miss statistics, allowing you to analyze the locality of the DFA in terms of cache performance.
 
@@ -111,7 +111,7 @@ Address Access Sequence:
 ...
 
 State Visit Sequence: [S1, S2, F1]
-Address access sequence saved to: output_trace.txt
+Address access sequence saved to: output_trace.din
 String accepted, reached final state.
 ```
 
