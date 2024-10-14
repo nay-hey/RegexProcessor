@@ -25,8 +25,9 @@ This project involves the creation of a **Deterministic Finite Automaton (DFA)**
 ### Step 1: Compile the Java Program
 
 1. Compile `TraceGenerator.java` to generate the trace:
-   ```sh
-   javac -d bin TraceGenerator.java  
+```sh
+javac -d bin TraceGenerator.java
+````
 2. Run `TraceGenerator` by providing the CSV file and the desired length of the trace:
 ```sh
 java -cp bin TraceGenerator <csv_file_name> <length> <debug>
