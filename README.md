@@ -123,3 +123,10 @@ String accepted, reached final state.
 For detailed information about the project, including the DFA structure, simulator functionality, and locality analysis, please refer to the project documentation available at the following Google Docs link:
 
 [Project Documentation](https://docs.google.com/document/d/1cPBO43YiXDs8ulJmK5JPkgwBo_k5As54sy0AdXT05PE/edit?usp=sharing)
+
+## Acknowledgments
+
+- **DineroIV Cache Simulator**: This project uses the **DineroIV** cache simulator for analyzing cache locality. DineroIV is developed by **Mark D. Hill** and his colleagues at the University of Wisconsin-Madison. You can find more information about DineroIV at the [DineroIV project page](http://pages.cs.wisc.edu/~markhill/DineroIV/).
+  
+---
+
