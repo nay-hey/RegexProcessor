@@ -1,49 +1,116 @@
 package processor;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-public class CSVParser {
+public class Main {
+    private static boolean debug = false;
 
-    public static List<Transition> parseTransitionTable(String csvFilePath) {
-        List<Transition> transitionTable = new ArrayList<>();
-        String[] headers;
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(csvFilePath))) {
-            String line = reader.readLine();
-            if (line != null) {
-                headers = line.split(",");
-            } else {
-                return transitionTable;
-            }
-
-            HashMap<String, Integer> headerToInt = new HashMap<>();
-            for (int i = 1; i < headers.length; i++) {
-                headerToInt.put(headers[i].trim(), i);
-            }
-
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length == headers.length) {
-                    String state = parts[0].trim();
-                    Transition transition = new Transition(state);
-
-                    for (int i = 1; i < parts.length; i++) {
-                        int symbol = headerToInt.get(headers[i].trim());
-                        String nextState = parts[i].trim();
-                        transition.symbolTransitions.add(new SymbolTransition(symbol, nextState));
-                    }
-                    transitionTable.add(transition);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+    public static void main(String[] args) {
+        if (args.length >= 4 && args[3].equals("debug")) {
+            debug = true;  
         }
 
-        return transitionTable;
+        if (args.length < 3) {
+            System.err.println("Usage: java processor.Main <csvFilePath> <traceFilePath> <outputFilePath>");
+            return;
+        }
+
+        String csvFilePath = args[0];
+        String traceFilePath = args[1];
+        String outputFilePath = args[2];
+
+        List<Transition> transitionTable = CSVParser.parseTransitionTable(csvFilePath);
+        if (transitionTable.isEmpty()) {
+            System.err.println("Error parsing CSV file.");
+            return;
+        }
+        
+        printTransitionTable(transitionTable);
+
+        String trace = readTraceFromFile(traceFilePath);
+        if (trace == null || trace.isEmpty()) {
+            System.err.println("Error reading trace from file or file is empty.");
+            return;
+        }
+
+        debugPrint("Provided trace: " + trace);
+        Set<String> finalStates = new HashSet<>();
+        for (Transition transition : transitionTable) {
+            if (transition.state.startsWith("F")) {
+                finalStates.add(transition.state);
+            }
+        }
+
+        Processor processor = new Processor(transitionTable, debug);
+        if (args.length >= 4 && args[3].equals("debug")) {
+            processor.setDebug(true);  
+        }
+        boolean result = processor.processInput(trace);
+        processor.printAddressAccessSequence(debug);
+        
+        processor.saveAddressAccessSequenceToFile(outputFilePath);
+
+        System.out.println("Address access sequence saved to: " + outputFilePath);
+        if (result) {
+            System.out.println("String accepted, reached final state.");
+        } else {
+            System.out.println("String rejected, did not reach final state.");
+        }
+
+        debugPrint("State Visit Sequence: " + processor.getStateVisitSequence());
+    }
+
+    private static void debugPrint(String message) {
+        if (debug) {
+            System.out.println("[DEBUG] " + message);
+        }
+    }
+
+    private static String readTraceFromFile(String filePath) {
+        try {
+            return new String(Files.readAllBytes(Paths.get(filePath))).trim();
+        } catch (IOException e) {
+            System.err.println("Error reading trace from file: " + e.getMessage());
+            return null;
+        }
+    }
+    private static void printTransitionTable(List<Transition> transitionTable) {
+        debugPrint("Transition Table:");
+        for (Transition transition : transitionTable) {
+            StringBuilder sb = new StringBuilder(transition.state + ": ");
+            for (SymbolTransition symbolTransition : transition.symbolTransitions) {
+                sb.append(symbolTransition.symbol)
+                  .append(" -> ")
+                  .append(symbolTransition.nextState)
+                  .append(", ");
+            }
+            debugPrint(sb.toString());
+        }
+    }
+}
+
+class Transition {
+    String state;
+    List<SymbolTransition> symbolTransitions;
+
+    Transition(String state) {
+        this.state = state;
+        this.symbolTransitions = new ArrayList<>();
+    }
+}
+
+class SymbolTransition {
+    int symbol;
+    String nextState;
+
+    SymbolTransition(int symbol, String nextState) {
+        this.symbol = symbol;
+        this.nextState = nextState;
     }
 }
