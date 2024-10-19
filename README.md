@@ -73,7 +73,7 @@ The `<debug>` argument is optional and can be `true` or `false`. If `true`, deta
 
    - Command to run DineroIV with the generated access sequence:
      ```sh
-     dineroIV -l1-usize 4 -l1-ubsize 4 -l1-uassoc 1 -l1-urepl l -informat d < output_trace.din > results.txt
+     ./dineroIV -l1-usize 4 -l1-ubsize 4 -l1-uassoc 1 -l1-urepl l -informat d < output_trace.din > results.txt
      ```
    - This runs a cache simulation and provides cache hit/miss statistics, allowing you to analyze the locality of the DFA in terms of cache performance.
 
