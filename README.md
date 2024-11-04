@@ -51,7 +51,7 @@ Example trace input:
 ### Note: 
 The `<debug>` argument is optional. To enable detailed debugging information (such as state transitions and address access sequences), simply include the `debug` flag when running the program. If you do not include this argument, debugging outputs will be disabled.
 
-## Example Usage:
+#### Example Usage:
 **With Debug Mode**:
    ```sh
    java -cp bin processor.Main <csv_file_path> <trace_file_path> <output_file_path> <edge_size> debug
@@ -85,9 +85,10 @@ The `<debug>` argument is optional. To enable detailed debugging information (su
 
 ### 2. **Cache Parameters**:
    - You can modify cache parameters in the **DineroIV** command. For example:
-     - `-l1-usize`: Level 1 cache size (e.g., 16K)
-     - `-informat d`: Data file input format
-
+    - `-l1-usize`: Level 1 cache size (e.g., `16K`, `8k`, etc.)
+    - `-l1-ubsize`: Block size (e.g., `4`, `8`, `16` bytes)
+    - `-l1-uassoc`: Cache associativity (e.g., `1` for direct-mapped, `2` for 2-way set associative)
+    - `-l1-urepl`: Replacement policy (e.g., `l` for least recently used)
 ---
 
 ## Debugging and Logging
