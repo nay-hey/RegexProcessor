@@ -30,7 +30,7 @@ javac -d bin TraceGenerator.java
 ````
 2. Run `TraceGenerator` by providing the CSV file and the desired length of the trace:
 ```sh
-java -cp bin TraceGenerator <csv_file_name> <length> <debug>
+java -cp bin TraceGenerator <csv_file_path> <trace_length> <output_file_path> <debug>
 ```
 This will output a trace string of symbols, e.g., 2,3,8,1,1,8,8,7,7,4.
 
@@ -43,7 +43,7 @@ javac -d bin src/processor/Main.java src/processor/Processor.java src/processor/
 2. Run the Main class in the processor package to simulate DFA processing. Pass the CSV file and the generated trace:
 
 ```sh
-java -cp bin processor.Main <csv_file> <trace> <debug>
+java -cp bin processor.Main <csv_file_path> <trace_file_path> <output_file_path> <edge_size> <debug>
 ```
 Example trace input:
 2,3,8,1,1,8,8,7,7,4
