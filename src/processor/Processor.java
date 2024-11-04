@@ -24,15 +24,16 @@ public class Processor {
     private final HashMap<String, Integer> addressMap;
     private final List<AddressAccess> addressAccessSequence; 
 
-    private static final int EDGE_SIZE = 2; 
+    private final int EDGE_SIZE; 
     private boolean debug;
 
-    public Processor(List<Transition> transitionTable) {
-        this(transitionTable, false); 
+    public Processor(List<Transition> transitionTable, int edgeSize) {
+        this(transitionTable, edgeSize, false); 
     }
 
-    public Processor(List<Transition> transitionTable, boolean debug) {
+    public Processor(List<Transition> transitionTable, int edgeSize, boolean debug) {
         this.transitionTable = transitionTable;
+        this.EDGE_SIZE = edgeSize; 
         this.debug = debug;
 
         this.currentState = transitionTable.stream()
