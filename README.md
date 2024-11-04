@@ -85,10 +85,10 @@ The `<debug>` argument is optional. To enable detailed debugging information (su
 
 ### 2. **Cache Parameters**:
    - You can modify cache parameters in the **DineroIV** command. For example:
-    - `-l1-usize`: Level 1 cache size (e.g., `16K`, `8k`, etc.)
-    - `-l1-ubsize`: Block size (e.g., `4`, `8`, `16` bytes)
-    - `-l1-uassoc`: Cache associativity (e.g., `1` for direct-mapped, `2` for 2-way set associative)
-    - `-l1-urepl`: Replacement policy (e.g., `l` for least recently used)
+   - `-l1-usize`: Level 1 cache size (e.g., `16K`, `8k`, etc.)
+   - `-l1-ubsize`: Block size (e.g., `4`, `8`, `16` bytes)
+   - `-l1-uassoc`: Cache associativity (e.g., `1` for direct-mapped, `2` for 2-way set associative)
+   - `-l1-urepl`: Replacement policy (e.g., `l` for least recently used)
 ---
 
 ## Debugging and Logging
