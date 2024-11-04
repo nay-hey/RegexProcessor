@@ -49,8 +49,14 @@ Example trace input:
 2,3,8,1,1,8,8,7,7,4
 
 ### Note: 
-The `<debug>` argument is optional and can be `true` or `false`. If `true`, detailed debugging information will be printed (such as state transitions and address access sequences). If `false`, debugging outputs will be disabled.
+The `<debug>` argument is optional. To enable detailed debugging information (such as state transitions and address access sequences), simply include the `debug` flag when running the program. If you do not include this argument, debugging outputs will be disabled.
 
+## Example Usage:
+**With Debug Mode**:
+   ```sh
+   java -cp bin processor.Main <csv_file_path> <trace_file_path> <output_file_path> <edge_size> debug
+   ```
+   
 3. **Output**:
    - The DFA simulation will generate a **State Visit Sequence** and an **Address Access Sequence** based on the transitions taken by the automaton.
    - The **Address Access Sequence** will be saved to the specified output file.
@@ -62,7 +68,7 @@ The `<debug>` argument is optional and can be `true` or `false`. If `true`, deta
    - Address access at each transition step.
    - Symbol-by-symbol processing of the input trace.
   
-- **Disabling Debug Mode**: Set the `<debug>` argument to `false` (or omit the argument) to run the simulation without detailed logs.
+- **Disabling Debug Mode**: Simply omit the `debug` argument to run the simulation without detailed logs.
 
 ---
 
