@@ -12,18 +12,19 @@ public class Main {
     private static boolean debug = false;
 
     public static void main(String[] args) {
-        if (args.length >= 4 && args[3].equals("debug")) {
+        if (args.length >= 5 && args[4].equals("debug")) {
             debug = true;  
         }
 
-        if (args.length < 3) {
-            System.err.println("Usage: java processor.Main <csvFilePath> <traceFilePath> <outputFilePath>");
+        if (args.length < 4) {
+            System.err.println("Usage: java processor.Main <csvFilePath> <traceFilePath> <outputFilePath> <edgeSize>");
             return;
         }
 
         String csvFilePath = args[0];
         String traceFilePath = args[1];
         String outputFilePath = args[2];
+        int edgeSize = Integer.parseInt(args[3]);
 
         List<Transition> transitionTable = CSVParser.parseTransitionTable(csvFilePath);
         if (transitionTable.isEmpty()) {
@@ -47,8 +48,8 @@ public class Main {
             }
         }
 
-        Processor processor = new Processor(transitionTable, debug);
-        if (args.length >= 4 && args[3].equals("debug")) {
+        Processor processor = new Processor(transitionTable, edgeSize, debug);
+        if (args.length >= 5 && args[4].equals("debug")) {
             processor.setDebug(true);  
         }
         boolean result = processor.processInput(trace);
