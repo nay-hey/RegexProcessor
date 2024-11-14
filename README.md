@@ -1,8 +1,36 @@
 # DFA Processor and Locality Analysis
 
-## Project Overview
+This project simulates a Deterministic Finite Automaton (DFA) and analyzes cache locality performance based on different configurations. 
 
-This project involves creating a **Deterministic Finite Automaton (DFA)** and a **DFA Simulator** to process input patterns. Additionally, the project includes **locality analysis** using both static and dynamic locality concepts, integrated with the **DineroIV** cache simulation tool to evaluate performance.
+The project includes:
+1. **DFA State Transition Definition**: Defines states and transitions in a CSV format.
+2. **Trace Generator**: Generates a sequence of state transitions (trace).
+3. **DFA Processor**: Simulates the DFA processing of the trace.
+4. **Cache Locality Analysis**: Assesses static and dynamic locality based on DFA processing.
+
+---
+
+## 1. DFA State Transition CSV
+
+The DFA structure is defined in a CSV file where:
+   - Each row represents a state (e.g., `I1`, `S2`, `F3`).
+   - Each column represents a transition on a specific input symbol (e.g., `p1`, `p2`).
+   - Each cell shows the next state for a specific state-input pair.
+
+Example CSV file:
+
+```csv
+states,p1,p2,p3,p1_p2,p1_p3,p2_p3,p1_p2_p3
+I1,S2,S2,S2,F3,S2,S2,S2
+S2,I1,I1,I1,I1,F3,I1,I1
+F3,F3,F3,F3,F3,F3,F3,F3
+```
+
+---
+
+## 2. Trace Generator
+
+The **TraceGenerator** generates a random sequence of state transitions for cache analysis. 
 
 ## How to Run the Program
 
@@ -85,7 +113,17 @@ Address access sequence saved to: output_trace.din
 ```
 
 ---
+## Cache Locality Analysis
 
+This analysis assesses the DFA's cache locality performance based on:
+- **Edge Size**: The memory required for each transition.
+- **Trace Pattern**: The sequence of transitions affects how well cache performs.
+
+Analyze locality by:
+1. **Adjusting Edge Size** to simulate different memory requirements.
+2. **Comparing Static vs. Dynamic Locality** based on DFA processing results.
+
+---
 ## Documentation
 
 Refer to the [Project Documentation](https://docs.google.com/document/d/1cPBO43YiXDs8ulJmK5JPkgwBo_k5As54sy0AdXT05PE/edit?usp=sharing) for a full project description.
