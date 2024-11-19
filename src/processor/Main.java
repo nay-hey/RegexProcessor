@@ -12,20 +12,35 @@ public class Main {
     private static boolean debug = false;
 
     public static void main(String[] args) {
-        if (args.length >= 5 && args[4].equals("debug")) {
-            debug = true;  
-        }
-
         if (args.length < 4) {
-            System.err.println("Usage: java processor.Main <csvFilePath> <traceFilePath> <outputFilePath> <edgeSize>");
+            System.err.println("Usage: java processor.Main <csvFilePath> <traceFilePath> <outputFilePath> <edgeSize> [maxLength] [debug]");
             return;
         }
-
+    
         String csvFilePath = args[0];
         String traceFilePath = args[1];
         String outputFilePath = args[2];
         int edgeSize = Integer.parseInt(args[3]);
-
+    
+        int maxLength = -1; 
+        boolean debug = false;
+    
+        if (args.length >= 5) {
+            try {
+                maxLength = Integer.parseInt(args[4]);
+            } catch (NumberFormatException e) {
+                if (args[4].equalsIgnoreCase("debug")) {
+                    debug = true; 
+                } else {
+                    System.err.println("Invalid maxLength argument. It must be an integer or omitted.");
+                    return;
+                }
+            }
+        }
+    
+        if (args.length == 6 && args[5].equalsIgnoreCase("debug")) {
+            debug = true;
+        }
         List<Transition> transitionTable = CSVParser.parseTransitionTable(csvFilePath);
         if (transitionTable.isEmpty()) {
             System.err.println("Error parsing CSV file.");
@@ -48,10 +63,11 @@ public class Main {
             }
         }
 
-        Processor processor = new Processor(transitionTable, edgeSize, debug);
-        if (args.length >= 5 && args[4].equals("debug")) {
-            processor.setDebug(true);  
+        Processor processor = new Processor(transitionTable, edgeSize, maxLength, debug);
+        if (args.length >= 5 && args[args.length - 1].equalsIgnoreCase("debug")) {
+            processor.setDebug(true);
         }
+        
         boolean result = processor.processInput(trace);
         processor.printAddressAccessSequence(debug);
         
