@@ -26,15 +26,17 @@ public class Processor {
 
     private final int EDGE_SIZE; 
     private boolean debug;
+    private int maxLength;
 
-    public Processor(List<Transition> transitionTable, int edgeSize) {
-        this(transitionTable, edgeSize, false); 
+    public Processor(List<Transition> transitionTable, int edgeSize, int maxLength) {
+        this(transitionTable, edgeSize, maxLength, false); 
     }
 
-    public Processor(List<Transition> transitionTable, int edgeSize, boolean debug) {
+    public Processor(List<Transition> transitionTable, int edgeSize, int maxLength, boolean debug) {
         this.transitionTable = transitionTable;
         this.EDGE_SIZE = edgeSize; 
         this.debug = debug;
+        this.maxLength = maxLength; 
 
         this.currentState = transitionTable.stream()
             .filter(transition -> transition.state.startsWith("I"))
@@ -68,8 +70,13 @@ public class Processor {
     
     public boolean processInput(String input) {
         String[] symbols = input.split(",");
-
-        for (int i = 0; i < symbols.length; i++) {
+        int length;
+        if(maxLength==-1)
+            length = symbols.length;
+        else
+            length = maxLength;
+        int i=0;
+        for (i = 0; i < length; i++) {
             int ch = Integer.parseInt(symbols[i]);
             Transition currentTransition = transitionTable.stream()
                 .filter(t -> t.state.equals(currentState))
@@ -82,13 +89,19 @@ public class Processor {
                     .filter(st -> st.symbol == ch)
                     .findFirst()
                     .orElse(null);
-
+                
                 if (nextTransition != null) {
                     String edgeKey = currentState + "," + ch + "->" + nextTransition.nextState;
                     int edgeAddress = addressMap.get(edgeKey);
                     String operationType = ""; 
                     addressAccessSequence.add(new AddressAccess(operationType, edgeAddress));
-
+                    if (nextTransition.nextState.startsWith("F")) {
+                        currentState = nextTransition.nextState;
+                        stateVisitSequence.add(currentState);
+                        if (debug) 
+                        System.out.println("Current state after processing '" + ch + "': " + currentState);
+                        break; 
+                    }
                     currentState = nextTransition.nextState;
                     stateVisitSequence.add(currentState); 
                     if (debug) {
@@ -101,8 +114,10 @@ public class Processor {
                     return false;
                 }
             }
-
+                   
         }
+        System.out.println("Processed input length of size : " + i);
+            
 
         return currentState.startsWith("F");
     }
