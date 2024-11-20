@@ -80,8 +80,6 @@ The **TraceGenerator** generates a random sequence of state transitions for cach
 
 ---
 
-This should be in line with your expectation. Let me know if there's anything else to adjust!
-
    **Output**:
    - The DFA simulation generates:
      - **State Visit Sequence** based on DFA transitions.
